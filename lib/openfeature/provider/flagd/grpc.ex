@@ -9,10 +9,12 @@ defmodule OpenFeature.Provider.Flagd.GRPC do
 
   @behaviour OpenFeature.Provider
 
-  alias OpenFeature.ResolutionDetails
-  alias OpenFeature.Provider.Flagd.Config
-  alias Google.Protobuf.Struct
   alias Flagd.Evaluation.V1, as: Eval
+  alias Google.Protobuf.Struct
+  alias OpenFeature.Provider.Flagd.Config
+  alias OpenFeature.ResolutionDetails
+  alias Protobuf.JSON.Decode
+  alias Protobuf.JSON.Encode
 
   @enforce_keys [:config]
   defstruct name: "FlagdGRPC",
@@ -80,7 +82,6 @@ defmodule OpenFeature.Provider.Flagd.GRPC do
           context :: any()
         ) :: OpenFeature.Provider.result()
   def resolve_boolean_value(provider, key, _default, context) do
-    IO.inspect("resolve_boolean was called")
     request = %Eval.ResolveBooleanRequest{flag_key: key, context: to_struct(context)}
 
     case Eval.Service.Stub.resolve_boolean(provider.channel, request) do
@@ -163,14 +164,14 @@ defmodule OpenFeature.Provider.Flagd.GRPC do
     }
   end
 
-  defp unwrap_value(%Struct{} = struct), do: Protobuf.JSON.Encode.encodable(struct, nil)
+  defp unwrap_value(%Struct{} = struct), do: Encode.encodable(struct, nil)
   defp unwrap_value(val), do: val
 
   defp to_struct(context) do
     context
     |> Enum.map(fn {k, v} -> {to_string(k), v} end)
     |> Enum.into(%{})
-    |> Protobuf.JSON.Decode.from_json_data(Google.Protobuf.Struct)
+    |> Decode.from_json_data(Google.Protobuf.Struct)
   end
 
   defp to_reason(nil), do: :unknown

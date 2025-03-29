@@ -41,6 +41,7 @@ defmodule OpenFeature.Provider.Flagd.GRPC.EventStream do
   alias OpenFeature.Client
   alias OpenFeature.EventEmitter
   alias OpenFeature.Provider.Flagd.GRPC, as: FlagdGRPC
+  alias Protobuf.JSON.Encode
 
   @spec start_link(Client.t()) :: GenServer.on_start()
   def start_link(%Client{provider: %FlagdGRPC{channel: channel, domain: domain}}) do
@@ -79,7 +80,7 @@ defmodule OpenFeature.Provider.Flagd.GRPC.EventStream do
   end
 
   defp handle_event({:ok, msg}, domain) do
-    case Protobuf.JSON.Encode.encodable(msg, nil) do
+    case Encode.encodable(msg, nil) do
       %{"type" => "keep_alive"} ->
         :ok
 

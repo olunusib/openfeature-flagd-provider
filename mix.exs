@@ -37,7 +37,6 @@ defmodule FlagdProvider.MixProject do
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.37", only: :docs, runtime: false},
-      {:google_protos, "~> 0.4.0"},
       {:grpc, "~> 0.9.0"},
       {:open_feature, "~> 0.1"},
       {:mimic, "~> 1.11", only: :test},

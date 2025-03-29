@@ -44,6 +44,9 @@ defmodule Mix.Tasks.Proto.Gen do
 
     Mix.shell().info("Running: #{cmd}")
     Mix.shell().cmd(cmd)
+
+    Mix.shell().info("Formatting generated code...")
+    Mix.Task.run("format")
   end
 
   defp download_proto!({url, path}) do

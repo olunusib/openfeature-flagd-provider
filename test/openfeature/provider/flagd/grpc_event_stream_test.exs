@@ -7,19 +7,20 @@ defmodule OpenFeature.Provider.Flagd.GRPC.EventStreamTest do
   setup :set_mimic_global
   setup :verify_on_exit!
 
-  alias Flagd.Evaluation.V1.Service.Stub
   alias Flagd.Evaluation.V1.EventStreamRequest
   alias Flagd.Evaluation.V1.EventStreamResponse
+  alias Flagd.Evaluation.V1.Service.Stub
   alias OpenFeature.EventEmitter
-  alias OpenFeature.Provider.Flagd.GRPC.EventStream
+  alias OpenFeature.Provider.Flagd.Config
   alias OpenFeature.Provider.Flagd.GRPC, as: FlagdGRPC
+  alias Protobuf.JSON.Decode
 
   defp json_struct(map) do
-    Protobuf.JSON.Decode.from_json_data(map, Google.Protobuf.Struct)
+    Decode.from_json_data(map, Google.Protobuf.Struct)
   end
 
   setup do
-    config = OpenFeature.Provider.Flagd.Config.new(port: 8013)
+    config = Config.new(port: 8013)
     provider = FlagdGRPC.new(config: config, domain: "test-domain")
 
     {:ok, _} = OpenFeature.set_provider("test-domain", provider)
@@ -42,7 +43,7 @@ defmodule OpenFeature.Provider.Flagd.GRPC.EventStreamTest do
       :ok
     end)
 
-    {:ok, _pid} = EventStream.start_link(client)
+    {:ok, _pid} = FlagdGRPC.EventStream.start_link(client)
 
     assert_receive :ready_emitted, 100
   end
@@ -52,7 +53,7 @@ defmodule OpenFeature.Provider.Flagd.GRPC.EventStreamTest do
 
     log =
       capture_log(fn ->
-        {:ok, _pid} = EventStream.start_link(client)
+        {:ok, _pid} = FlagdGRPC.EventStream.start_link(client)
         Process.sleep(20)
       end)
 
@@ -85,7 +86,7 @@ defmodule OpenFeature.Provider.Flagd.GRPC.EventStreamTest do
       :ok
     end)
 
-    {:ok, _pid} = EventStream.start_link(client)
+    {:ok, _pid} = FlagdGRPC.EventStream.start_link(client)
 
     assert_receive :config_changed_emitted, 100
   end
@@ -95,7 +96,7 @@ defmodule OpenFeature.Provider.Flagd.GRPC.EventStreamTest do
 
     log =
       capture_log(fn ->
-        assert :error = EventStream.start_link(bad_client)
+        assert :error = FlagdGRPC.EventStream.start_link(bad_client)
       end)
 
     assert log =~ "doesn't use the gRPC provider"

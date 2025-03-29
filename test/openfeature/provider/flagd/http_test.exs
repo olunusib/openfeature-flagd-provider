@@ -5,10 +5,11 @@ defmodule OpenFeature.Provider.Flagd.HTTPTest do
   setup :set_mimic_global
   setup :verify_on_exit!
 
+  alias OpenFeature.Provider.Flagd.Config
   alias OpenFeature.Provider.Flagd.HTTP, as: FlagdHTTP
 
   setup do
-    config = OpenFeature.Provider.Flagd.Config.new(port: 8015)
+    config = Config.new(port: 8015)
     provider = FlagdHTTP.new(config: config)
     {:ok, provider: provider}
   end

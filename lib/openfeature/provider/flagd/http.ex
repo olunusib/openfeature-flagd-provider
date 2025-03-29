@@ -7,8 +7,8 @@ defmodule OpenFeature.Provider.Flagd.HTTP do
 
   @behaviour OpenFeature.Provider
 
-  alias OpenFeature.ResolutionDetails
   alias OpenFeature.Provider.Flagd.Config
+  alias OpenFeature.ResolutionDetails
 
   @enforce_keys [:config]
   defstruct name: "FlagdHTTP",

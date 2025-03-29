@@ -5,14 +5,15 @@ defmodule Openfeature.Provider.Flagd.GRPCTest do
   setup :set_mimic_global
   setup :verify_on_exit!
 
-  alias OpenFeature.Provider.Flagd.GRPC, as: FlagdGRPC
-  alias Flagd.Evaluation.V1.Service.Stub
   alias Flagd.Evaluation.V1.ResolveBooleanResponse
+  alias Flagd.Evaluation.V1.Service.Stub
+  alias OpenFeature.Provider.Flagd.Config
+  alias OpenFeature.Provider.Flagd.GRPC, as: FlagdGRPC
 
   setup do
     Mimic.expect(GRPC.Stub, :connect, fn _target, _opts -> {:ok, :channel} end)
 
-    config = OpenFeature.Provider.Flagd.Config.new(port: 8013)
+    config = Config.new(port: 8013)
     provider = FlagdGRPC.new(config: config)
     {:ok, provider: provider}
   end
