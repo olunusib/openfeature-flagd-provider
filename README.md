@@ -55,6 +55,19 @@ client = OpenFeature.get_client()
 OpenFeature.Client.get_boolean_value(client, "my-feature", false)
 ```
 
+## Regenerating gRPC Protos (Development Only)
+
+This project includes a mix task to download and generate Elixir modules from the latest [`flagd`](https://buf.build/open-feature/flagd) protobuf definitions.
+
+To regenerate:
+
+```sh
+mix proto.gen
+```
+
+> [!NOTE]
+> You must have both `protoc` and `protoc-gen-elixir` available in your system `PATH` for this task to work. See the [official docs](https://hexdocs.pm/protobuf/readme.html#generate-elixir-code) for installation instructions.
+
 ## Roadmap
 
 - [ ] In-process provider using the flagd sync protocol
