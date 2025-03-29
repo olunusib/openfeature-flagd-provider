@@ -11,7 +11,7 @@ defmodule Openfeature.Provider.Flagd.GRPCTest do
   alias OpenFeature.Provider.Flagd.GRPC, as: FlagdGRPC
 
   setup do
-    Mimic.expect(GRPC.Stub, :connect, fn _target, _opts -> {:ok, :channel} end)
+    expect(GRPC.Stub, :connect, fn _target, _opts -> {:ok, :channel} end)
 
     config = Config.new(port: 8013)
     provider = FlagdGRPC.new(config: config)
