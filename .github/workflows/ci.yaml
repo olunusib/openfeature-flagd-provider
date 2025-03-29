@@ -1,0 +1,71 @@
+name: CI Jobs
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci-checks:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - elixir: "1.14"
+            otp: "24.3"
+          - elixir: "1.17"
+            otp: "27.0"
+          - elixir: "1.18"
+            otp: "27.0"
+            lint: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Elixir and OTP
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Check formatting
+        if: ${{ matrix.lint }}
+        run: mix format --check-formatted
+
+      - name: Check unused dependencies
+        if: ${{ matrix.lint }}
+        run: mix deps.unlock --check-unused
+
+      - name: Compile dependencies
+        run: mix deps.compile
+
+      - name: Compile with warnings as errors
+        if: ${{ matrix.lint }}
+        run: mix compile --warnings-as-errors
+
+      - name: Run Credo
+        if: ${{ matrix.lint }}
+        run: mix credo --strict
+
+      - name: Run tests
+        run: mix test
+
+      - name: Run Dialyzer
+        if: ${{ matrix.lint }}
+        run: mix dialyzer

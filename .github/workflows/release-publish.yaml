@@ -1,0 +1,52 @@
+name: Release Piblish Jobs
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run release-please
+        uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          release-type: elixir
+
+  # publish-to-hex:
+  #   needs: release
+  #   runs-on: ubuntu-latest
+  #   if: ${{ needs.release.outputs.release_created }}
+  #   environment: Hex
+  #   steps:
+  #     - name: Check out code
+  #       uses: actions/checkout@v4
+
+  #     - uses: erlef/setup-beam@v1
+  #       with:
+  #         otp-version: "27.0"
+  #         elixir-version: "1.18"
+
+  #     - name: Run mix deps.get
+  #       run: mix deps.get --only docs
+
+  #     - name: Run mix deps.compile
+  #       run: mix deps.compile
+
+  #     - name: Run mix compile
+  #       run: mix compile
+  #       env:
+  #         MIX_ENV: docs
+
+  #     - name: Run mix hex.publish
+  #       run: mix hex.publish --yes
+  #       env:
+  #         HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
+  #         MIX_ENV: docs
